@@ -7,13 +7,16 @@ class ChatroomController < ApplicationController
     end
 
     def getAllMessages
-        @message = Message.all
+        # @message =  Message.all
+        @message =  Message.custom_display
         render :json => @message
     end
 
     def createMessage
-        @message1 = Message.new(params.permit(:body, :user_id))
-        render :json => @message1.save
+        message = Message.new(params.permit(:body, :user_id))
+        message.save
+        ActionCable.server.broadcast "chatroom_channel", foo: message.body
+        render :json => message
     end
 
     def createUser
